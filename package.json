@@ -4,7 +4,10 @@
     "description": "Syl-Web static starter.",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "css": "sass ./src/styles/main.scss ./build/assets/styles/style.css"
+        "css": "gulp scss",
+        "clean": "gulp clean",
+        "build": "gulp build",
+        "twig": "gulp twig"
     },
     "keywords": [],
     "author": {
@@ -16,6 +19,7 @@
     "dependencies": {
         "@popperjs/core": "^2.11.5",
         "bootstrap": "5.2.0-beta1",
+        "gulp-rename": "^2.0.0",
         "jquery": "^3.6.0"
     },
     "devDependencies": {
