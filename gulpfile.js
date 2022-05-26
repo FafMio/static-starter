@@ -48,11 +48,12 @@ gulp.task('scss', () => {
     return gulp.src(paths.styles.dir + paths.styles.files)
         //? If there is errors
         .pipe(sass({ outputStyle: 'compressed' }).on('error', function (err) { console.log(err.message) }))
-        //? Set destination folder.
+        //? Rename the dirname to set the destination.
         .pipe(rename((file) => {
             file.dirname = '';
             file.basename = "style";
         }))
+        //? Set destination folder.
         .pipe(gulp.dest(paths.styles.dest));
 });
 
@@ -68,15 +69,16 @@ gulp.task('twig', () => {
             //? Else, juste render the Twig template.
             fileExists(fileData)
                 .then((exist) => {
-                    if (exist) { return JSON.parse(fs.readFileSync(fileData)) };
+                    if (exist) {return JSON.parse(fs.readFileSync(fileData)) };
                 });
         }))
         .pipe(twig().on('error', (err) => {
             process.stderr.write(err.message + '\n');
         }))
+        //? Rename the dirname to set the destination.
         .pipe(rename((file) => {
             file.dirname += path.sep;
-            file.dirname = (file.dirname).replace(paths.twig.dir, paths.twig.dest);
+            file.dirname = (file.dirname).replace(paths.twig.dir, paths.twig.dest).replace('build' + path.sep, '');
         }))
         //? Set destination folder.
         .pipe(gulp.dest(paths.twig.dest));
