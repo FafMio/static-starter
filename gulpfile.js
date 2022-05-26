@@ -10,6 +10,7 @@ let gulp = require('gulp'),
     concat = require('gulp-concat'),
     sourcemaps = require('gulp-sourcemaps'),
     rename = require("gulp-rename"),
+    merge = require("gulp-merge"),
     browserSync = require('browser-sync'),
     del = require('del'),
     fs = require('fs'),
@@ -69,9 +70,15 @@ gulp.task('twig', () => {
             //? Else, juste render the Twig template.
             fileExists(fileData)
                 .then((exist) => {
+                    console.log(fileData + " - " + exist);
                     if (exist) {return JSON.parse(fs.readFileSync(fileData)) };
                 });
         }))
+        // .pipe(merge({
+        //     edit: (json, file) => {
+
+        //     }
+        // }))
         .pipe(twig().on('error', (err) => {
             process.stderr.write(err.message + '\n');
         }))
