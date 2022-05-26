@@ -18,28 +18,28 @@ let gulp = require('gulp'),
 //? Using `path.sep` for kernel compatibilities (Windows, Linux, MacOS)
 let paths = {
     styles: {
-        src: '.' + path.sep + 'src' + path.sep + 'styles' + path.sep + '**' + path.sep + '*.scss',
-        dir: '.' + path.sep + 'src' + path.sep + 'styles' + path.sep + '',
+        src: 'src' + path.sep + 'styles' + path.sep + '**' + path.sep + '*.scss',
+        dir: 'src' + path.sep + 'styles' + path.sep + '',
         files: '**' + path.sep + '*.scss',
-        dest: '.' + path.sep + 'build' + path.sep + 'assets' + path.sep + 'css' + path.sep + ''
+        dest: 'build' + path.sep + 'assets' + path.sep + 'css' + path.sep + ''
     },
     scripts: {
-        src: '.' + path.sep + 'src' + path.sep + 'scripts' + path.sep + '**' + path.sep + '*.js',
-        dir: '.' + path.sep + 'src' + path.sep + 'scripts' + path.sep + '',
+        src: 'src' + path.sep + 'scripts' + path.sep + '**' + path.sep + '*.js',
+        dir: 'src' + path.sep + 'scripts' + path.sep + '',
         files: '**' + path.sep + '*.js',
-        dest: '.' + path.sep + 'build' + path.sep + 'assets' + path.sep + 'js' + path.sep + ''
+        dest: 'build' + path.sep + 'assets' + path.sep + 'js' + path.sep + ''
     },
     build: {
-        dest: '.' + path.sep + 'build' + path.sep + '',
+        dest: 'build' + path.sep + '',
     },
     twig: {
-        src: '.' + path.sep + 'src' + path.sep + 'templates' + path.sep + 'pages' + path.sep + '**' + path.sep + '*.twig',
-        dir: '.' + path.sep + 'src' + path.sep + 'templates' + path.sep + 'pages' + path.sep + '',
+        src: 'src' + path.sep + 'templates' + path.sep + 'pages' + path.sep + '**' + path.sep + '*.twig',
+        dir: 'src' + path.sep + 'templates' + path.sep + 'pages' + path.sep + '',
         files: '**' + path.sep + '*.twig',
-        dest: '.' + path.sep + 'build' + path.sep + ''
+        dest: 'build' + path.sep + ''
     },
     datas: {
-        dir: '.' + path.sep + 'src' + path.sep + 'datas' + path.sep + '',
+        dir: 'src' + path.sep + 'datas' + path.sep + '',
     }
 };
 
@@ -74,6 +74,10 @@ gulp.task('twig', () => {
         .pipe(twig().on('error', (err) => {
             process.stderr.write(err.message + '\n');
         }))
+        .pipe(rename((file) => {
+            file.dirname += path.sep;
+            file.dirname = (file.dirname).replace(paths.twig.dir, paths.twig.dest);
+        }))
         //? Set destination folder.
         .pipe(gulp.dest(paths.twig.dest));
 });
@@ -99,3 +103,5 @@ gulp.task('watch', () => {
     // gulp.watch(paths.scripts.dir, ['js', browserSync.reload()]);
     // gulp.watch(paths.twig.dir, ['twig', browserSync.reload()]);
 });
+
+gulp.task('build', gulp.series('scss', 'twig'));
