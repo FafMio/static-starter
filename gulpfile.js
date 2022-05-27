@@ -75,6 +75,16 @@ gulp.task('js', () => {
         .pipe(gulp.dest(paths.scripts.dest));
 });
 
+//* Building Javascripts
+gulp.task('img', () => {
+    return gulp.src(paths.images.src)
+        .pipe(rename((file) => {
+            file.dirname += path.sep;
+            file.dirname = (file.dirname).replace(paths.images.dir, '').replace('build' + path.sep, '');
+        }))
+        .pipe(gulp.dest(paths.images.dest));
+  });
+
 //* Building Twig to HTML Files
 gulp.task('twig', () => {
     return gulp.src(paths.twig.src)
@@ -111,12 +121,14 @@ gulp.task('clean', () => {
 });
 
 //* Make build
-gulp.task('build', gulp.series('clean', 'js', 'sass', 'twig'));
+gulp.task('build', gulp.series('clean', 'img', 'js', 'sass', 'twig'));
 
 //* Starting auto reloadable server withs watchers
 gulp.task('serve', gulp.series('build', () => {
     browserSync.init({ server: paths.build.dest, notify: true });
     gulp.watch(paths.styles.src.split(path.sep).join('/'), gulp.series('sass')).on('change', () => { browserSync.reload(); });
+    gulp.watch(paths.scripts.src.split(path.sep).join('/'), gulp.series('js')).on('change', () => { browserSync.reload(); });
+    gulp.watch(paths.images.src.split(path.sep).join('/'), gulp.series('img')).on('change', () => { browserSync.reload(); });
     gulp.watch(paths.twig.src.split(path.sep).join('/'), gulp.series('twig')).on('change', () => { browserSync.reload(); });
 }));
 
