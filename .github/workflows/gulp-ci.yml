@@ -26,5 +26,6 @@ jobs:
         
       - name: Building project
         run: npm run build
+        
       - name: Deploy on server with Rsync
         run: rsync -az -e "ssh -p ${{ secrets.SSH_PORT }}" --delete --exclude=.git ./build/* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_DEST }}
