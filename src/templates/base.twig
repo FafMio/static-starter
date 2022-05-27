@@ -1,12 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ language }}">
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title> 
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>
+        {% block title %}
+            Title
+        {% endblock title %}
+    </title>
+    {% block meta %}
+        <meta name="description" content="{% block meta_description %}{% endblock meta_description %}">
+    {% endblock meta %}
+
+   {% block styles %}
+       <link rel="stylesheet" href="/assets/css/style.css">
+   {% endblock %}
 </head>
+
+{% block body %}
 <body>
-    
+    <header>
+        {% include '/partials/header.twig' %}
+    </header>
+
+    {% block content %}{% endblock content %}
+
+    {% block footer %}
+    {% include '/partials/footer.twig' %}
+    {% endblock footer %}
 </body>
+{% endblock body %}
+
 </html>
