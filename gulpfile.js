@@ -1,17 +1,16 @@
 "use strict";
-const { dest } = require('gulp');
-let gulp = require('gulp'),
-    path = require('path'),
-    data = require('gulp-data'),
-    twig = require('gulp-twig'),
-    babel = require('gulp-babel'),
-    sass = require('gulp-sass')(require('sass')),
-    plumber = require('gulp-plumber'),
-    rename = require("gulp-rename"),
+let babel = require('gulp-babel'),
     browserSync = require('browser-sync').create(),
+    data = require('gulp-data'),
     del = require('del'),
+    fileExists = require('file-exists'),
     fs = require('fs'),
-    fileExists = require('file-exists');
+    gulp = require('gulp'),
+    plumber = require('gulp-plumber'),
+    path = require('path'),
+    rename = require("gulp-rename"),
+    sass = require('gulp-sass')(require('sass')),
+    twig = require('gulp-twig');
 
 //? Using `path.sep` for kernel compatibilities (Windows, Linux, MacOS)
 let paths = {
@@ -51,7 +50,7 @@ let paths = {
 gulp.task('sass', () => {
     return gulp.src(paths.styles.src)
         //? If there is errors
-        .pipe(sass({ outputStyle: 'compressed' }).on('error', function (err) { console.log(err.message) }))
+        .pipe(sass({ outputStyle: 'compressed' }).on('error', (err) => { console.log(err.message); }))
         //? Rename the dirname to set the destination.
         .pipe(rename((file) => {
             file.dirname = '';
@@ -62,10 +61,24 @@ gulp.task('sass', () => {
         .pipe(browserSync.stream());
 });
 
+//* Building Javascripts
+gulp.task('js', () => {
+    return gulp.src(paths.scripts.src)
+        //? Babel compiler
+        .pipe(babel())
+        //? Rename the dirname to set the destination.
+        .pipe(rename((file) => {
+            file.dirname += path.sep;
+            file.dirname = (file.dirname).replace(paths.scripts.dir, '').replace('build' + path.sep, '');
+        }))
+        //? Set destination folder.
+        .pipe(gulp.dest(paths.scripts.dest));
+});
+
 //* Building Twig to HTML Files
 gulp.task('twig', () => {
     return gulp.src(paths.twig.src)
-        .pipe(plumber({ errorHandler: (err) => { console.log(err) } }))
+        .pipe(plumber({ errorHandler: (err) => { console.log(err); } }))
         //? Compile twig files with their own data with own json file if there is one.
         .pipe(data((file) => {
             let fileDir = path.dirname(file.path).replace(__filename.replace('gulpfile.js', ''), '') + path.sep + path.basename(file.path);
@@ -75,8 +88,7 @@ gulp.task('twig', () => {
             //? Else, juste render the Twig template.
             fileExists(fileData)
                 .then((exist) => {
-                    console.log(fileData + " - " + exist);
-                    if (exist) {return JSON.parse(fs.readFileSync(fileData)) };
+                    if (exist) { return JSON.parse(fs.readFileSync(fileData)) };
                 });
         }))
         //? check if there is error in twig files.
@@ -98,34 +110,15 @@ gulp.task('clean', () => {
     return del([paths.build.dest]);
 });
 
-//* Building Javascripts
-gulp.task('js',() => {
-    return gulp.src(paths.scripts.src)
-    //? Babel compiler
-    .pipe(babel())
-    //? Rename the dirname to set the destination.
-    .pipe(rename((file) => {
-        file.dirname += path.sep;
-        file.dirname = (file.dirname).replace(paths.scripts.dir, '').replace('build' + path.sep, '');
-    }))
-    //? Set destination folder.
-    .pipe(gulp.dest(paths.scripts.dest));
-});
+//* Make build
+gulp.task('build', gulp.series('clean', 'js', 'sass', 'twig'));
 
 //* Starting auto reloadable server withs watchers
-gulp.task('serve', gulp.series('clean', 'sass', 'twig', () => {
-    browserSync.init({server: paths.build.dest, notify: true});
-    gulp.watch(paths.styles.src.split(path.sep).join('/'), gulp.series('sass')).on('change', () => {browserSync.reload();});
-    gulp.watch(paths.twig.src.split(path.sep).join('/'), gulp.series('twig')).on('change', () => {browserSync.reload();});
-}))
-
-//* Make build
-gulp.task('build', gulp.series('clean', 'sass', 'twig'));
-
-gulp.task('test', () => {
-    console.log(paths.twig.src);
-    console.log();
-})
+gulp.task('serve', gulp.series('build', () => {
+    browserSync.init({ server: paths.build.dest, notify: true });
+    gulp.watch(paths.styles.src.split(path.sep).join('/'), gulp.series('sass')).on('change', () => { browserSync.reload(); });
+    gulp.watch(paths.twig.src.split(path.sep).join('/'), gulp.series('twig')).on('change', () => { browserSync.reload(); });
+}));
 
 //* Default command : start the serve
-gulp.task('default', gulp.series('serve'))
+gulp.task('default', gulp.series('serve'));
