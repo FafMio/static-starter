@@ -11,7 +11,7 @@ let gulp = require('gulp'),
     sourcemaps = require('gulp-sourcemaps'),
     rename = require("gulp-rename"),
     merge = require("gulp-merge"),
-    browserSync = require('browser-sync'),
+    browserSync = require('browser-sync').create(),
     del = require('del'),
     fs = require('fs'),
     fileExists = require('file-exists');
@@ -39,14 +39,20 @@ let paths = {
         files: '**' + path.sep + '*.twig',
         dest: 'build' + path.sep + ''
     },
+    images: {
+        src: 'src' + path.sep + 'images' + path.sep + '**' + path.sep + '*.{gif,jpg,png,svg}',
+        dir: 'src' + path.sep + 'images' + path.sep + '',
+        files: '**' + path.sep + '*.twig',
+        dest: 'build' + path.sep + ''
+    },
     datas: {
         dir: 'src' + path.sep + 'datas' + path.sep + '',
     }
 };
 
 //* Building the CSS from Sass
-gulp.task('scss', () => {
-    return gulp.src(paths.styles.dir + paths.styles.files)
+gulp.task('sass', () => {
+    return gulp.src(paths.styles.src)
         //? If there is errors
         .pipe(sass({ outputStyle: 'compressed' }).on('error', function (err) { console.log(err.message) }))
         //? Rename the dirname to set the destination.
@@ -55,7 +61,8 @@ gulp.task('scss', () => {
             file.basename = "style";
         }))
         //? Set destination folder.
-        .pipe(gulp.dest(paths.styles.dest));
+        .pipe(gulp.dest(paths.styles.dest))
+        .pipe(browserSync.stream());
 });
 
 //* Building Twig to HTML Files
@@ -74,11 +81,6 @@ gulp.task('twig', () => {
                     if (exist) {return JSON.parse(fs.readFileSync(fileData)) };
                 });
         }))
-        // .pipe(merge({
-        //     edit: (json, file) => {
-
-        //     }
-        // }))
         .pipe(twig().on('error', (err) => {
             process.stderr.write(err.message + '\n');
         }))
@@ -106,11 +108,18 @@ gulp.task('js', () => {
     .pipe(gulp.dest(paths.scripts.dest));
 });
 
-//* Creating the watchers
-gulp.task('watch', () => {
-    gulp.watch(paths.styles.dir, ['scss']);
-    // gulp.watch(paths.scripts.dir, ['js', browserSync.reload()]);
-    // gulp.watch(paths.twig.dir, ['twig', browserSync.reload()]);
-});
+//* Starting auto reloadable server withs watchers
+gulp.task('serve', gulp.series('clean', 'sass', 'twig', () => {
+    browserSync.init({server: paths.build.dest, notify: true});
+    gulp.watch(paths.styles.src.split(path.sep).join('/'), gulp.series('sass')).on('change', () => {browserSync.reload();});
+    gulp.watch(paths.twig.src.split(path.sep).join('/'), gulp.series('twig')).on('change', () => {browserSync.reload();});
+}))
 
-gulp.task('build', gulp.series('scss', 'twig'));
+gulp.task('build', gulp.series('clean', 'sass', 'twig'));
+
+gulp.task('test', () => {
+    console.log(paths.twig.src);
+    console.log();
+})
+
+gulp.task('default', gulp.series('serve'))
