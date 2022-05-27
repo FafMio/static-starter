@@ -4,10 +4,11 @@
     "description": "Syl-Web static starter.",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "css": "gulp scss",
+        "css": "gulp sass",
         "clean": "gulp clean",
         "build": "gulp build",
-        "twig": "gulp twig"
+        "twig": "gulp twig",
+        "default": "gulp serve"
     },
     "keywords": [],
     "author": {
