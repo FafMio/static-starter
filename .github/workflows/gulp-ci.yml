@@ -1,4 +1,4 @@
-name: Guild Build
+name: Gulp Build
 
 on:
   pull_request:
