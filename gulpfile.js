@@ -6,7 +6,9 @@ let babel = require('gulp-babel'),
     fileExists = require('file-exists'),
     fs = require('fs'),
     gulp = require('gulp'),
+    htmlmin = require('gulp-htmlmin'),
     plumber = require('gulp-plumber'),
+    prettify = require('gulp-prettify'),
     path = require('path'),
     rename = require("gulp-rename"),
     sass = require('gulp-sass')(require('sass')),
@@ -31,6 +33,7 @@ let paths = {
     },
     twig: {
         src: 'src' + path.sep + 'templates' + path.sep + 'pages' + path.sep + '**' + path.sep + '*.twig',
+        watcher: 'src' + path.sep + 'templates' + path.sep + '**' + path.sep + '*.twig',
         dir: 'src' + path.sep + 'templates' + path.sep + 'pages' + path.sep + '',
         files: '**' + path.sep + '*.twig',
         dest: 'build' + path.sep + ''
@@ -105,6 +108,15 @@ gulp.task('twig', () => {
         .pipe(twig().on('error', (err) => {
             process.stderr.write(err.message + '\n');
         }))
+        //? Minify it to be prettier after.
+        .pipe(htmlmin({
+            collapseWhitespace: true,
+            html5: true
+        }))
+        .pipe(prettify({
+            indent_size: 4,
+            preserve_newlines: true
+        }))
         //? Rename the dirname to set the destination.
         .pipe(rename((file) => {
             file.dirname += path.sep;
@@ -113,6 +125,13 @@ gulp.task('twig', () => {
         //? Set destination folder.
         .pipe(gulp.dest(paths.twig.dest));
 });
+
+//* Minify the HTML results
+gulp.task('minify', () => {
+    return gulp.src(paths.twig.dest + paths.twig.files.replace('.twig', '.html'))
+        
+        .pipe(gulp.dest(paths.twig.dest));
+})
 
 //* Delete the 'build' file.
 gulp.task('clean', () => {
@@ -129,7 +148,7 @@ gulp.task('serve', gulp.series('build', () => {
     gulp.watch(paths.styles.src.split(path.sep).join('/'), gulp.series('sass')).on('change', () => { browserSync.reload(); });
     gulp.watch(paths.scripts.src.split(path.sep).join('/'), gulp.series('js')).on('change', () => { browserSync.reload(); });
     gulp.watch(paths.images.src.split(path.sep).join('/'), gulp.series('img')).on('change', () => { browserSync.reload(); });
-    gulp.watch(paths.twig.src.split(path.sep).join('/'), gulp.series('twig')).on('change', () => { browserSync.reload(); });
+    gulp.watch(paths.twig.watcher.split(path.sep).join('/'), gulp.series('twig')).on('change', () => { browserSync.reload(); });
 }));
 
 //* Default command : start the serve
