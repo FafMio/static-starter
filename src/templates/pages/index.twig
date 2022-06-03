@@ -1,3 +1,12 @@
 {% extends "../base.twig" %}
 
-coucou Oui super ,iquel :) 
+{% block title %}
+    ma pute
+{% endblock title %}
+
+{% block body %}
+    {{ parent() }}
+    {% block content %}
+        yo
+    {% endblock content %}
+{% endblock body %}
