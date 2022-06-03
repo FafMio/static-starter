@@ -45,7 +45,10 @@ let paths = {
         dest: 'build' + path.sep + 'assets' + path.sep + 'images' + path.sep + ''
     },
     datas: {
+        src: 'src' + path.sep + 'datas' + path.sep + '**' + path.sep + '*.json',
+        watcher: 'src' + path.sep + 'datas' + path.sep + '**' + path.sep + '*.json',
         dir: 'src' + path.sep + 'datas' + path.sep + '',
+        src: '**' + path.sep + '*.json',
     }
 };
 
@@ -93,18 +96,24 @@ gulp.task('twig', () => {
     return gulp.src(paths.twig.src)
         .pipe(plumber({ errorHandler: (err) => { console.log(err); } }))
         //? Compile twig files with their own data with own json file if there is one.
-        .pipe(data((file) => {
+        .pipe(data(function (file) {
+            console.log(file.path);
             let fileDir = path.dirname(file.path).replace(__filename.replace('gulpfile.js', ''), '') + path.sep + path.basename(file.path);
             let fileData = fileDir.replace(paths.twig.dir, paths.datas.dir).replace('.twig', '.json');
 
             //? Render Twig template with data if data.json exist.
             //? Else, juste render the Twig template.
             fileExists(fileData)
-                .then((exist) => {
-                    if (exist) { return JSON.parse(fs.readFileSync(fileData)) };
+            .then((exist) => {
+                    console.log(fileData);
+                    if (exist) {
+                        console.log(exist);
+                        let s = JSON.parse(fs.readFileSync(fileData));
+                        console.log(s);
+                        return s;
+                    } else return "";
                 });
         }))
-        //? check if there is error in twig files.
         .pipe(twig().on('error', (err) => {
             process.stderr.write(err.message + '\n');
         }))
@@ -126,13 +135,6 @@ gulp.task('twig', () => {
         .pipe(gulp.dest(paths.twig.dest));
 });
 
-//* Minify the HTML results
-gulp.task('minify', () => {
-    return gulp.src(paths.twig.dest + paths.twig.files.replace('.twig', '.html'))
-        
-        .pipe(gulp.dest(paths.twig.dest));
-})
-
 //* Delete the 'build' file.
 gulp.task('clean', () => {
     //? Delete the build folder.
@@ -148,7 +150,7 @@ gulp.task('serve', gulp.series('build', () => {
     gulp.watch(paths.styles.src.split(path.sep).join('/'), gulp.series('sass')).on('change', () => { browserSync.reload(); });
     gulp.watch(paths.scripts.src.split(path.sep).join('/'), gulp.series('js')).on('change', () => { browserSync.reload(); });
     gulp.watch(paths.images.src.split(path.sep).join('/'), gulp.series('img')).on('change', () => { browserSync.reload(); });
-    gulp.watch(paths.twig.watcher.split(path.sep).join('/'), gulp.series('twig')).on('change', () => { browserSync.reload(); });
+    gulp.watch([paths.twig.watcher.split(path.sep).join('/'), paths.datas.watcher.split(path.sep).join('/')], gulp.series('twig')).on('change', () => { browserSync.reload(); });
 }));
 
 //* Default command : start the serve
