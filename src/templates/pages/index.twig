@@ -1,12 +1,13 @@
 {% extends "../base.twig" %}
 
-{% block title %}
-    ma pute
-{% endblock title %}
-
 {% block body %}
     {{ parent() }}
     {% block content %}
-        yo
+        <section class="mt-10" id="welcome">
+            <div class="p-4 w-full text-center bg-white rounded-lg border shadow-md sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+                <h5 class="mb-2 text-3xl font-bold text-gray-900 dark:text-white">{{ welcome.header.title }}</h5>
+                <p class="mb-5 text-base text-gray-500 sm:text-lg dark:text-gray-400">{{ welcome.header.content }}</p>
+            </div>
+        </section>
     {% endblock content %}
 {% endblock body %}

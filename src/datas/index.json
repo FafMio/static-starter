@@ -1,3 +1,33 @@
 {
-    "title": "Hello World"
+    "page": {
+        "title": "Static Starter",
+        "description": "Default Static index.html page."
+    },
+    "navbar": {
+        "title": "Static Starter",
+        "image": {
+            "href": "/assets/images/logo.png",
+            "alt": "Logo navbar"
+        },
+        "links": [
+            {
+                "text": "Accueil",
+                "href": "/"
+            },
+            {
+                "text": "Page 1",
+                "href": "#"
+            },
+            {
+                "text": "Page 2",
+                "href": "#"
+            }
+        ]
+    },
+    "welcome": {
+        "header": {
+            "title": "Bienvenue sur le Static Starter",
+            "content": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad impedit quaerat magni. Deleniti omnis fugiat suscipit eaque? Aspernatur, facere eum libero quam officiis modi, atque fuga laborum dicta rem officia."
+        }
+    }
 }
