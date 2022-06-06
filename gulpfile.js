@@ -1,17 +1,19 @@
 "use strict";
 let babel = require('gulp-babel'),
     browserSync = require('browser-sync').create(),
+    concat = require('gulp-concat'),
     data = require('gulp-data'),
     del = require('del'),
-    fileExists = require('file-exists'),
     fs = require('fs'),
     gulp = require('gulp'),
     htmlmin = require('gulp-htmlmin'),
     plumber = require('gulp-plumber'),
     prettify = require('gulp-prettify'),
     path = require('path'),
+    postcss = require('gulp-postcss'),
     rename = require("gulp-rename"),
     sass = require('gulp-sass')(require('sass')),
+    tailwindcss = require('tailwindcss'),
     twig = require('gulp-twig');
 
 //? Using `path.sep` for kernel compatibilities (Windows, Linux, MacOS)
@@ -61,7 +63,16 @@ gulp.task('sass', () => {
             file.basename = "style";
         }))
         .pipe(gulp.dest(paths.styles.dest))
-        .pipe(browserSync.stream());
+        .pipe(browserSync.stream())
+
+        .pipe(postcss([
+            tailwindcss('./tailwind.config.js'),
+            require('autoprefixer')
+        ]))
+        .pipe(concat({ path: 'vendor.css'}))
+        .pipe(gulp.dest(paths.styles.dest))
+        
+        ;
 });
 
 //* Building Javascripts
@@ -83,7 +94,7 @@ gulp.task('img', () => {
             file.dirname = (file.dirname).replace(paths.images.dir, '').replace('build' + path.sep, '');
         }))
         .pipe(gulp.dest(paths.images.dest));
-  });
+});
 
 //* Building Twig to HTML Files
 gulp.task('twig', () => {
@@ -91,7 +102,7 @@ gulp.task('twig', () => {
         .pipe(plumber({ errorHandler: (err) => { console.log(err); } }))
         .pipe(data(function (file) {
             let fileDir = path.dirname(file.path).replace(__filename.replace('gulpfile.js', ''), '') + path.sep + path.basename(file.path);
-            let fileData = fileDir.replace(paths.twig.dir, paths.datas.dir).replace('.twig', '.json');         
+            let fileData = fileDir.replace(paths.twig.dir, paths.datas.dir).replace('.twig', '.json');
 
             try {
                 return JSON.parse(fs.readFileSync(fileData));
@@ -103,7 +114,7 @@ gulp.task('twig', () => {
             process.stderr.write(err.message + '\n');
         }))
         .pipe(htmlmin({
-            collapseWhitespace: true,
+            collapseWhitespace: false,
             html5: true
         }))
         .pipe(prettify({
@@ -131,7 +142,7 @@ gulp.task('serve', gulp.series('build', () => {
     gulp.watch(paths.styles.src.split(path.sep).join('/'), gulp.series('sass')).on('change', () => { browserSync.reload(); });
     gulp.watch(paths.scripts.src.split(path.sep).join('/'), gulp.series('js')).on('change', () => { browserSync.reload(); });
     gulp.watch(paths.images.src.split(path.sep).join('/'), gulp.series('img')).on('change', () => { browserSync.reload(); });
-    gulp.watch([paths.twig.watcher.split(path.sep).join('/'), paths.datas.watcher.split(path.sep).join('/')], gulp.series('twig')).on('change', () => { browserSync.reload(); });
+    gulp.watch([paths.twig.watcher.split(path.sep).join('/'), paths.datas.watcher.split(path.sep).join('/')], gulp.series('twig', 'sass')).on('change', () => { browserSync.reload(); });
 }));
 
 //* Default command : start the serve
