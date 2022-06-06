@@ -1,35 +1,27 @@
 <!DOCTYPE html>
-<html lang="{{ language }}">
+<html lang="fr">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>
-        {% block title %}
-            Title
-        {% endblock title %}
+        {% block title %}Title{% endblock title %}
     </title>
     {% block meta %}
         <meta name="description" content="{% block meta_description %}{% endblock meta_description %}">
     {% endblock meta %}
 
-   {% block styles %}
-       <link rel="stylesheet" href="/assets/css/style.css">
-   {% endblock %}
+    {% block styles %}
+        <link rel="stylesheet" href="/assets/css/style.css">
+    {% endblock %}
 </head>
 
-{% block body %}
 <body>
-    <header>
-        {% include '/partials/header.twig' %}
-    </header>
-
-    {% block content %}{% endblock content %}
-
-    {% block footer %}
-    {% include '/partials/footer.twig' %}
-    {% endblock footer %}
+    {% block body %}
+        {% block header %}{% include '/partials/header.twig' %}{% endblock header %}
+        {% block content %}{% endblock content %}
+        {% block footer %}{% include '/partials/footer.twig' %}{% endblock footer %}
+    {% endblock body %}
 </body>
-{% endblock body %}
 
 </html>
