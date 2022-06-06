@@ -55,14 +55,11 @@ let paths = {
 //* Building the CSS from Sass
 gulp.task('sass', () => {
     return gulp.src(paths.styles.src)
-        //? If there is errors
         .pipe(sass({ outputStyle: 'compressed' }).on('error', (err) => { console.log(err.message); }))
-        //? Rename the dirname to set the destination.
         .pipe(rename((file) => {
             file.dirname = '';
             file.basename = "style";
         }))
-        //? Set destination folder.
         .pipe(gulp.dest(paths.styles.dest))
         .pipe(browserSync.stream());
 });
@@ -70,14 +67,11 @@ gulp.task('sass', () => {
 //* Building Javascripts
 gulp.task('js', () => {
     return gulp.src(paths.scripts.src)
-        //? Babel compiler
         .pipe(babel())
-        //? Rename the dirname to set the destination.
         .pipe(rename((file) => {
             file.dirname += path.sep;
             file.dirname = (file.dirname).replace(paths.scripts.dir, '').replace('build' + path.sep, '');
         }))
-        //? Set destination folder.
         .pipe(gulp.dest(paths.scripts.dest));
 });
 
@@ -95,29 +89,19 @@ gulp.task('img', () => {
 gulp.task('twig', () => {
     return gulp.src(paths.twig.src)
         .pipe(plumber({ errorHandler: (err) => { console.log(err); } }))
-        //? Compile twig files with their own data with own json file if there is one.
         .pipe(data(function (file) {
-            console.log(file.path);
             let fileDir = path.dirname(file.path).replace(__filename.replace('gulpfile.js', ''), '') + path.sep + path.basename(file.path);
-            let fileData = fileDir.replace(paths.twig.dir, paths.datas.dir).replace('.twig', '.json');
+            let fileData = fileDir.replace(paths.twig.dir, paths.datas.dir).replace('.twig', '.json');         
 
-            //? Render Twig template with data if data.json exist.
-            //? Else, juste render the Twig template.
-            fileExists(fileData)
-            .then((exist) => {
-                    console.log(fileData);
-                    if (exist) {
-                        console.log(exist);
-                        let s = JSON.parse(fs.readFileSync(fileData));
-                        console.log(s);
-                        return s;
-                    } else return "";
-                });
+            try {
+                return JSON.parse(fs.readFileSync(fileData));
+            } catch (error) {
+                return {};
+            }
         }))
         .pipe(twig().on('error', (err) => {
             process.stderr.write(err.message + '\n');
         }))
-        //? Minify it to be prettier after.
         .pipe(htmlmin({
             collapseWhitespace: true,
             html5: true
@@ -126,18 +110,15 @@ gulp.task('twig', () => {
             indent_size: 4,
             preserve_newlines: true
         }))
-        //? Rename the dirname to set the destination.
         .pipe(rename((file) => {
             file.dirname += path.sep;
             file.dirname = (file.dirname).replace(paths.twig.dir, paths.twig.dest).replace('build' + path.sep, '');
         }))
-        //? Set destination folder.
         .pipe(gulp.dest(paths.twig.dest));
 });
 
 //* Delete the 'build' file.
 gulp.task('clean', () => {
-    //? Delete the build folder.
     return del([paths.build.dest]);
 });
 
