@@ -2,7 +2,7 @@
 <h3 align="center">A Static Starter to make Static Website Creation easily using Twig, Sass and CI/CD with Github Actions</h3>
 
 ## Languages and Tools
-<img src="https://api.hephe.net/icons/gulp-brands.svg" alt="gulp" width="40" height="40"> <img src="https://api.hephe.net/icons/node-js-brands.svg" alt="nodejs" width="40" height="40"> <img src="https://api.hephe.net/icons/sass-brands.svg" alt="sass" width="40" height="40"/> <img src="https://api.hephe.net/icons/html5-brands.svg" alt="html5" width="40" height="40"> <img src="https://api.hephe.net/icons/js-square-brands.svg" alt="javascript" width="40" height="40">
+<img src="https://static.hephe.net/images/icons/gulp-brands.svg" alt="gulp" width="40" height="40"> <img src="https://static.hephe.net/images/icons/node-js-brands.svg" alt="nodejs" width="40" height="40"> <img src="https://static.hephe.net/images/icons/sass-brands.svg" alt="sass" width="40" height="40"/> <img src="https://static.hephe.net/images/icons/html5-brands.svg" alt="html5" width="40" height="40"> <img src="https://static.hephe.net/images/icons/js-square-brands.svg" alt="javascript" width="40" height="40">
 
 ## 🚀 Github Action Requirments for CI/CD
 Go to this link : https://github.com/user/repo/actions and add those following <strong>Action Secret</strong> to your project.
